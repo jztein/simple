@@ -1,0 +1,45 @@
+<html>
+
+<title>Simple {{ title }}</title>
+
+<body>
+  <textarea id="editor" rows="10">{{ content }}</textarea>
+</body>
+
+<script type="text/javascript">
+var oldContent = document.getElementById("editor").value;
+var saving = false;
+
+var saveNewContent = function() {
+  var newContent = document.getElementById("editor").value;
+
+  if (oldContent == newContent || saving) return;
+  oldContent = newContent;
+
+  var request = new FormData();
+  request.append('docId', {{ doc_id }});
+  request.append('content', newContent);
+
+  console.log('Saving:', request, '...');
+  sendSaveRequest(request);
+};
+
+var sendSaveRequest = function(request) {
+  var http = new XMLHttpRequest();
+  http.onreadystatechange = function() {
+    if (http.status == 200) {
+      console.log('Saved');
+      saving = false;
+    } else if (http.status == 500) {
+      console.log('Failed to save');
+    }
+  };
+  http.open('POST', '/save', true);
+  http.send(request);
+  saving = true;
+};
+
+window.setInterval(saveNewContent, 2000);  // 2 seconds.
+</script>
+
+</html>

@@ -1,0 +1,17 @@
+<html>
+<title>Simple {{ email }}</title>
+<body>
+  <h1>{{ name }}'s docs</h1>
+  <div>
+    New document
+    <form action="/create" method="post">
+      <input type="text" name="title"><br>
+      <input type="submit" value="Create"></input>
+    </form>
+  <ul>
+  {% for doc in doc_metadatas %}
+    <li><a href="/editor?docid={{ doc.doc_id }}">{{ doc.title }}</a></li>
+  {% endfor %}
+  </ul>
+</body>
+</html>
