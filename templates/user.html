@@ -10,7 +10,10 @@
     </form>
   <ul>
   {% for doc in doc_metadatas %}
-    <li><a href="/editor?docid={{ doc.doc_id }}">{{ doc.title }}</a></li>
+    <li>
+      <a href="/docs?docid={{ doc.doc_id }}">{{ doc.title }}</a>
+      <a href="/view?docid={{ doc.doc_id }}">View</a>
+    </li>
   {% endfor %}
   </ul>
 </body>

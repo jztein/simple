@@ -3,16 +3,34 @@
 <title>Simple {{ title }}</title>
 
 <body>
-  <textarea id="editor" rows="10">{{ content }}</textarea>
+  <textarea id="editor" rows="50" cols="70">{{ content }}</textarea>
 </body>
+
+<style>
+#editor {
+  border: 0px none;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#editor:focus {
+  border: 0px none;
+  outline: none;
+}
+</style>
 
 <script type="text/javascript">
 var oldContent = document.getElementById("editor").value;
 var saving = false;
 
-var saveNewContent = function() {
-  var newContent = document.getElementById("editor").value;
+var getEditor = function() {
+  return document.getElementById("editor");
+};
 
+var saveNewContent = function() {
+  var newContent = getEditor().value;
   if (oldContent == newContent || saving) return;
   oldContent = newContent;
 
@@ -20,26 +38,26 @@ var saveNewContent = function() {
   request.append('docId', {{ doc_id }});
   request.append('content', newContent);
 
-  console.log('Saving:', request, '...');
+  console.log('Saving:', request.content, '...');
   sendSaveRequest(request);
 };
 
+
 var sendSaveRequest = function(request) {
+  saving = true;
   var http = new XMLHttpRequest();
   http.onreadystatechange = function() {
-    if (http.status == 200) {
+    if (http.readyState == 4 && http.status == 200) {
       console.log('Saved');
       saving = false;
-    } else if (http.status == 500) {
-      console.log('Failed to save');
     }
   };
   http.open('POST', '/save', true);
   http.send(request);
-  saving = true;
 };
 
-window.setInterval(saveNewContent, 2000);  // 2 seconds.
+getEditor().addEventListener('keyup', saveNewContent);
+// window.setInterval(saveNewContent, 2000);  // 2 seconds.
 </script>
 
 </html>

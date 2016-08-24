@@ -17,7 +17,7 @@ class Document(ndb.Model):
   created_timestamp = ndb.DateTimeProperty(auto_now_add=True)
   updated_timestamp = ndb.DateTimeProperty(auto_now=True)
   title = ndb.StringProperty(default='')
-  content = ndb.StringProperty(default='')
+  content = ndb.StringProperty(default='', indexed=False)
 
   @classmethod
   def list(cls, user):
@@ -80,6 +80,20 @@ class EditorPage(webapp2.RequestHandler):
     self.response.write(html)
 
 
+class ViewerPage(webapp2.RequestHandler):
+  def get(self):
+    doc_id = self.request.get('docid')
+    if not doc_id: return
+    logging.info('Getting doc by ID: %s', doc_id)
+    doc = Document.get_by_id(int(doc_id))
+    if not doc: return
+    title, content = doc.title, doc.content
+    template = env.get_template('viewer.html')
+    html = template.render(title=title, content=content)
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.write(html)
+
+
 class SaveHandler(webapp2.RequestHandler):
   def post(self):
     params = self.request.params.items();
@@ -101,6 +115,7 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/user', UserPage),
     ('/docs', EditorPage),
+    ('/view', ViewerPage),
     ('/create', CreateHandler),
     ('/save', SaveHandler),
 ], debug=True)
